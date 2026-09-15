@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
 import {
   createSession,
+  ensureSuperadmin,
   setSessionCookie,
   userPayload,
   verifyPassword,
@@ -18,6 +19,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
   }
 
+  await ensureSuperadmin();
   const user = await User.findOne({ email });
   if (!user || !verifyPassword(password, user.passwordHash)) {
     return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 });
